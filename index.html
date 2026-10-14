@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>SPK AHP – Pemilihan Mobil</title>
+    <style>
+        :root {
+            --bg: #f4f6f8;
+            --card: #fff;
+            --tx: #1b2430;
+            --mut: #667085;
+            --bd: #dfe4ea;
+            --ac: #0b6bcb;
+            --gr: #5aa516;
+            --ok: #18794e;
+            --bad: #c0392b;
+            --hl: #eaf4ff;
+            box-sizing: border-box;
+            padding-top: env(safe-area-inset-top, 0px);
+            padding-bottom: env(safe-area-inset-bottom, 0px)
+        }
+
+        @media (prefers-color-scheme:dark) {
+            :root:not([data-theme="light"]) {
+                --bg: #12161c;
+                --card: #1b222b;
+                --tx: #e8ecf1;
+                --mut: #94a0b0;
+                --bd: #2c3642;
+                --ac: #4aa3ff;
+                --gr: #8bd13f;
+                --ok: #4cc38a;
+                --bad: #ff7b6b;
+                --hl: #1d2f45
+            }
+        }
+
+        :root[data-theme="dark"] {
+            --bg: #12161c;
+            --card: #1b222b;
+            --tx: #e8ecf1;
+            --mut: #94a0b0;
+            --bd: #2c3642;
+            --ac: #4aa3ff;
+            --gr: #8bd13f;
+            --ok: #4cc38a;
+            --bad: #ff7b6b;
+            --hl: #1d2f45
+        }
+
+        html {
+            scroll-padding-top: env(safe-area-inset-top, 0px)
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--tx);
+            font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif
+        }
+
+        header {
+            background: linear-gradient(90deg, #5aa516, #0b6bcb);
+            color: #fff;
+            padding: 22px 16px
+        }
+
+        header h1 {
+            margin: 0 0 4px;
+            font-size: 1.35rem
+        }
+
+        header p {
+            margin: 0;
+            opacity: .92;
+            font-size: .9rem
+        }
+
+        main {
+            max-width: 980px;
+            margin: 0 auto;
+            padding: 16px
+        }
+
+        .card {
+            background: var(--card);
+            border: 1px solid var(--bd);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px
+        }
+
+        h2 {
+            margin: 0 0 8px;
+            font-size: 1.1rem
+        }
+
+        h3 {
+            margin: 14px 0 6px;
+            font-size: .95rem;
+            color: var(--mut)
+        }
+
+        .hint {
+            color: var(--mut);
+            font-size: .85rem;
+            margin: 0 0 10px
+        }
+
+        .sc {
+            overflow-x: auto
+        }
+
+        table {
+            border-collapse: collapse;
+            width: 100%;
+            font-size: .88rem
+        }
+
+        th,
+        td {
+            border: 1px solid var(--bd);
+            padding: 6px 10px;
+            text-align: center;
+            white-space: nowrap
+        }
+
+        th {
+            background: var(--hl)
+        }
+
+        td:first-child,
+        th:first-child {
+            text-align: left;
+            font-weight: 600
+        }
+
+        .tree {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-size: .88rem
+        }
+
+        .row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center
+        }
+
+        .bx {
+            border: 2px solid var(--tx);
+            border-radius: 6px;
+            padding: 6px 12px;
+            font-weight: 600;
+            background: var(--card)
+        }
+
+        .lv {
+            color: var(--mut);
+            font-size: .78rem
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 8px
+        }
+
+        .grid label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid var(--bd);
+            border-radius: 8px;
+            padding: 6px 10px;
+            font-size: .88rem
+        }
+
+        input {
+            width: 70px;
+            padding: 5px 6px;
+            border: 1px solid var(--bd);
+            border-radius: 6px;
+            background: var(--bg);
+            color: var(--tx);
+            font: inherit;
+            text-align: center
+        }
+
+        input.err {
+            border-color: var(--bad);
+            outline: 1px solid var(--bad)
+        }
+
+        .st {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+            font-size: .88rem;
+            align-items: center
+        }
+
+        .b {
+            padding: 2px 10px;
+            border-radius: 99px;
+            font-weight: 700;
+            font-size: .8rem;
+            color: #fff
+        }
+
+        .b.ok {
+            background: var(--ok)
+        }
+
+        .b.no {
+            background: var(--bad)
+        }
+
+        .win {
+            background: var(--hl);
+            border-left: 4px solid var(--gr);
+            padding: 10px 14px;
+            border-radius: 8px;
+            margin-bottom: 12px
+        }
+
+        .bar {
+            height: 10px;
+            background: var(--bd);
+            border-radius: 6px;
+            min-width: 90px
+        }
+
+        .bar i {
+            display: block;
+            height: 100%;
+            border-radius: 6px;
+            background: linear-gradient(90deg, var(--gr), var(--ac))
+        }
+
+        tr.top td {
+            background: var(--hl);
+            font-weight: 700
+        }
+
+        button {
+            background: var(--ac);
+            color: #fff;
+            border: 0;
+            border-radius: 8px;
+            padding: 8px 14px;
+            font: inherit;
+            cursor: pointer
+        }
+
+        .kpis {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 10px;
+            margin-bottom: 14px
+        }
+
+        .kpi {
+            border: 1px solid var(--bd);
+            border-radius: 10px;
+            padding: 10px 14px;
+            background: var(--bg)
+        }
+
+        .kpi span {
+            display: block;
+            color: var(--mut);
+            font-size: .78rem
+        }
+
+        .kpi b {
+            font-size: 1.1rem
+        }
+
+        .g2 {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 12px;
+            margin-bottom: 14px
+        }
+
+        @media(max-width:700px) {
+            .g2 {
+                grid-template-columns: 1fr
+            }
+        }
+
+        .pn {
+            border: 1px solid var(--bd);
+            border-radius: 10px;
+            padding: 12px 14px
+        }
+
+        .pn h3 {
+            margin-top: 0
+        }
+
+        .hb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 8px 0;
+            font-size: .85rem
+        }
+
+        .hb .nm {
+            width: 92px;
+            flex: none
+        }
+
+        .hb b {
+            width: 58px;
+            text-align: right;
+            flex: none
+        }
+
+        .tr {
+            flex: 1;
+            display: flex;
+            height: 20px;
+            border-radius: 5px;
+            overflow: hidden;
+            background: var(--bd)
+        }
+
+        .tr i {
+            display: block;
+            height: 100%
+        }
+
+        .lgs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px 14px;
+            margin-top: 8px;
+            font-size: .78rem;
+            color: var(--mut)
+        }
+
+        .lg i {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            margin-right: 5px
+        }
+
+        .dn {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            margin: 8px auto;
+            display: grid;
+            place-items: center
+        }
+
+        .dn>div {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: var(--card);
+            display: grid;
+            place-items: center;
+            text-align: center;
+            line-height: 1.1
+        }
+
+        footer {
+            text-align: center;
+            color: var(--mut);
+            font-size: .8rem;
+            padding: 10px 16px 24px
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Sistem Pendukung Keputusan – Pemilihan Mobil</h1>
+        <p>Metode Analytical Hierarchy Process (AHP) · Alternatif: Avanza, Xenia, Ertiga, Grand Livina</p>
+    </header>
+    <main>
+        <section class="card">
+            <h2>1. Hierarki</h2>
+            <div class="tree"><span class="lv">Tujuan</span>
+                <div class="bx">Membeli Mobil</div><span class="lv">Kriteria</span>
+                <div class="row">
+                    <div class="bx">Style</div>
+                    <div class="bx">Keandalan</div>
+                    <div class="bx">Konsumsi Bahan Bakar</div>
+                </div>
+                <span class="lv">Alternatif</span>
+                <div class="row">
+                    <div class="bx">Avanza</div>
+                    <div class="bx">Xenia</div>
+                    <div class="bx">Ertiga</div>
+                    <div class="bx">Grand Livina</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="card">
+            <h2>2. Dashboard Hasil Akhir</h2>
+            <div class="kpis" id="kpi"></div>
+            <div class="g2" id="charts"></div>
+            <h3>Tabel sintesis</h3>
+            <div id="final"></div>
+        </section>
+
+        <div class="card" style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+            <span class="hint" style="margin:0">Nilai perbandingan bisa diubah (skala Saaty 1–9, boleh pecahan
+                <b>1/3</b> atau desimal <b>1,5</b>). Hasil dihitung ulang otomatis.</span>
+            <button id="reset">Kembalikan data soal</button>
+        </div>
+        <div id="mats"></div>
+    </main>
+    <footer>Dibuat untuk tugas Pertemuan ke-9 – Analytical Hierarchy Process (AHP)</footer>
+    <script>
+        const C = ['Style', 'Keandalan', 'Konsumsi Bahan Bakar'], A = ['Avanza', 'Xenia', 'Ertiga', 'Grand Livina'];
+        const RI = { 1: 0, 2: 0, 3: 0.58, 4: 0.9 };
+        const D = {
+            k: { t: '3. Matriks Perbandingan Kriteria', L: C, v: { '1-0': '2', '2-0': '1/3', '2-1': '1/4' } },
+            s: { t: '4. Alternatif terhadap Kriteria Style', L: A, v: { '1-0': '1/2', '2-0': '3', '3-0': '4', '2-1': '2', '3-1': '5', '3-2': '1/2' } },
+            r: { t: '5. Alternatif terhadap Kriteria Keandalan', L: A, v: { '1-0': '1/2', '2-0': '4', '3-0': '3', '2-1': '5', '3-1': '4', '3-2': '1/3' } },
+            b: { t: '6. Alternatif terhadap Kriteria Konsumsi Bahan Bakar', L: A, v: { '1-0': '1/2', '2-0': '2', '3-0': '1/4', '2-1': '1.5', '3-1': '1/3', '3-2': '1/4' } }
+        };
+        let S = JSON.parse(JSON.stringify(D));
+        const f = x => x.toFixed(4);
+        function parse(s) { s = String(s).trim().replace(',', '.'); let r; if (s.includes('/')) { const [a, b] = s.split('/').map(Number); r = a / b } else r = Number(s); return isFinite(r) && r > 0 ? r : NaN }
+        function calc(k) {
+            const d = S[k], n = d.L.length, M = Array.from({ length: n }, () => Array(n).fill(1)); let bad = false;
+            for (let i = 1; i < n; i++)for (let j = 0; j < i; j++) { let v = parse(d.v[i + '-' + j]); if (isNaN(v)) { bad = true; v = 1 } M[i][j] = v; M[j][i] = 1 / v }
+            const cs = M[0].map((_, j) => M.reduce((a, r) => a + r[j], 0));
+            const N = M.map(r => r.map((x, j) => x / cs[j]));
+            const w = N.map(r => r.reduce((a, b) => a + b, 0) / n);
+            const aw = M.map(r => r.reduce((a, x, j) => a + x * w[j], 0));
+            const lam = aw.reduce((a, x, i) => a + x / w[i], 0) / n;
+            const ci = (lam - n) / (n - 1), cr = ci / RI[n];
+            return { M, cs, N, w, lam, ci, cr, bad, n };
+        }
+        function tbl(head, rows) { return '<div class="sc"><table><tr>' + head.map(h => '<th>' + h + '</th>').join('') + '</tr>' + rows.map(r => '<tr' + (r.cls ? ' class="' + r.cls + '"' : '') + '>' + r.c.map(c => '<td>' + c + '</td>').join('') + '</tr>').join('') + '</table></div>' }
+        function build() {
+            let h = '';
+            for (const k in S) {
+                const d = S[k]; let p = '';
+                for (let i = 1; i < d.L.length; i++)for (let j = 0; j < i; j++)
+                    p += '<label>' + d.L[i] + ' : ' + d.L[j] + '<input data-k="' + k + '" data-p="' + i + '-' + j + '" value="' + d.v[i + '-' + j] + '" inputmode="decimal"></label>';
+                h += '<section class="card"><h2>' + d.t + '</h2><h3>Input perbandingan (baris : kolom)</h3><div class="grid">' + p + '</div><div id="r-' + k + '"></div></section>';
+            }
+            document.getElementById('mats').innerHTML = h;
+        }
+        function showMat(k, R) {
+            const d = S[k], L = d.L, n = R.n;
+            let o = '<h3>Matriks perbandingan berpasangan</h3>' + tbl([''].concat(L), R.M.map((r, i) => ({ c: [L[i]].concat(r.map(f)) })).concat([{ cls: 'top', c: ['Jumlah'].concat(R.cs.map(f)) }]));
+            o += '<h3>Matriks ternormalisasi &amp; bobot prioritas</h3>' + tbl([''].concat(L, ['Bobot (rata-rata baris)']), R.N.map((r, i) => ({ c: [L[i]].concat(r.map(f), ['<b>' + f(R.w[i]) + '</b>']) })));
+            const ok = R.cr <= 0.1;
+            o += '<div class="st"><span>λ maks = <b>' + f(R.lam) + '</b></span><span>CI = <b>' + f(R.ci) + '</b></span><span>RI = <b>' + RI[n] + '</b></span><span>CR = <b>' + f(R.cr) + '</b></span><span class="b ' + (ok ? 'ok' : 'no') + '">' + (ok ? 'Konsisten (CR ≤ 0,1)' : 'Tidak konsisten (CR &gt; 0,1)') + '</span></div>';
+            document.getElementById('r-' + k).innerHTML = o;
+        }
+        function update() {
+            const R = {};
+            for (const k in S) { R[k] = calc(k); showMat(k, R[k]) }
+            const wk = R.k.w, keys = ['s', 'r', 'b'];
+            const sc = A.map((_, i) => keys.reduce((a, k, c) => a + wk[c] * R[k].w[i], 0));
+            const order = sc.map((v, i) => [v, i]).sort((a, b) => b[0] - a[0]);
+            const rank = {}; order.forEach((o, r) => rank[o[1]] = r + 1);
+            const mx = order[0][0];
+            let h = '<div class="win">Rekomendasi terbaik: <b>' + A[order[0][1]] + '</b> dengan skor <b>' + f(order[0][0]) + '</b></div>';
+            h += '<p class="hint">Skor akhir = Σ (bobot kriteria × bobot alternatif pada kriteria tersebut). Bobot kriteria: ' + C.map((c, i) => c + ' = ' + f(wk[i])).join(' · ') + '.</p>';
+            const rows = order.map(([v, i], r) => ({ cls: r == 0 ? 'top' : '', c: [A[i], f(R.s.w[i]), f(R.r.w[i]), f(R.b.w[i]), '<b>' + f(v) + '</b>', '<div class="bar"><i style="width:' + (v / mx * 100) + '%"></i></div>', r + 1] }));
+            h += tbl(['Alternatif', 'Style', 'Keandalan', 'Konsumsi BBM', 'Skor akhir', '', 'Peringkat'], rows);
+            const bad = Object.values(R).filter(r => r.cr > 0.1).length;
+            if (bad) h += '<p class="hint" style="color:var(--bad);margin-top:10px">Peringatan: ' + bad + ' matriks memiliki CR &gt; 0,1 sehingga penilaian perlu ditinjau ulang.</p>';
+            document.getElementById('final').innerHTML = h;
+            dash(R, wk, order, mx);
+        }
+        const CL = ['#7172ad', '#509ee3', '#88bf4d'], K3 = ['s', 'r', 'b'];
+        function dash(R, wk, order, mx) {
+            const bad = Object.values(R).filter(r => r.cr > 0.1).length, mw = Math.max(...wk);
+            const kp = [['Rekomendasi terbaik', A[order[0][1]]], ['Skor tertinggi', f(mx)], ['Kriteria terpenting', C[wk.indexOf(mw)] + ' (' + f(mw) + ')'], ['Konsistensi', bad ? bad + ' matriks CR > 0,1' : 'Semua matriks konsisten']];
+            document.getElementById('kpi').innerHTML = kp.map(k => '<div class="kpi"><span>' + k[0] + '</span><b>' + k[1] + '</b></div>').join('');
+            const lg = (t) => '<div class="lgs">' + C.map((c, i) => '<span class="lg"><i style="background:' + CL[i] + '"></i>' + c + (t ? ' ' + (wk[i] * 100).toFixed(1) + '%' : '') + '</span>').join('') + '</div>';
+            const bars = order.map(([v, i]) => '<div class="hb"><span class="nm">' + A[i] + '</span><div class="tr">' + K3.map((k, c) => '<i style="width:' + (wk[c] * R[k].w[i] / mx * 100) + '%;background:' + CL[c] + '" title="' + C[c] + ': ' + f(wk[c] * R[k].w[i]) + '"></i>').join('') + '</div><b>' + f(v) + '</b></div>').join('');
+            let a = 0; const cg = wk.map((w, i) => { const s = a; a += w * 100; return CL[i] + ' ' + s + '% ' + a + '%' }).join(',');
+            document.getElementById('charts').innerHTML = '<div class="pn"><h3>Skor akhir &amp; kontribusi tiap kriteria</h3>' + bars + lg(0) + '</div><div class="pn"><h3>Bobot kriteria</h3><div class="dn" style="background:conic-gradient(' + cg + ')"><div><b>3</b><small>kriteria</small></div></div>' + lg(1) + '</div>';
+        }
+        document.getElementById('mats').addEventListener('input', e => {
+            const t = e.target; if (!t.dataset.k) return;
+            S[t.dataset.k].v[t.dataset.p] = t.value;
+            t.classList.toggle('err', isNaN(parse(t.value)));
+            update();
+        });
+        document.getElementById('reset').onclick = () => { S = JSON.parse(JSON.stringify(D)); build(); update() };
+        build(); update();
+    </script>
+</body>
+
+</html>
